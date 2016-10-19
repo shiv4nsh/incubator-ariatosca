@@ -72,7 +72,7 @@ def scale_entity(context, graph, scalable_entity_name, delta, scale_compute):
         context,
         {
             scale_id: {
-                'instances': planned_num_instances
+                'instances': planned_num_instances,
 
                 # These following parameters are not exposed at the moment,
                 # but should be used to control which node instances get scaled in
@@ -132,15 +132,14 @@ def scale_entity(context, graph, scalable_entity_name, delta, scale_compute):
                 scaling_down_node_instances=removed,
                 related_nodes=related))
     except:
-        context.logger.warn('Rolling back deployment modification. '
-                        '[modification_id={0}]'.format(modification.id))
+        context.logger.warn('Rolling back deployment modification. [modification_id={0}]'
+                            .format(modification.id))
         try:
             rollback_deployment_modification(context, modification.id)
         except:
             context.logger.warn('Deployment modification rollback failed. The '
-                            'deployment model is most likely in some corrupted'
-                            ' state.'
-                            '[modification_id={0}]'.format(modification.id))
+                                'deployment model is most likely in some corrupted'
+                                ' state.[modification_id={0}]'.format(modification.id))
             raise
         raise
     else:
@@ -150,9 +149,8 @@ def scale_entity(context, graph, scalable_entity_name, delta, scale_compute):
             finish_deployment_modification(context, modification.id)
         except:
             context.logger.warn('Deployment modification finish failed. The '
-                            'deployment model is most likely in some corrupted'
-                            ' state.'
-                            '[modification_id={0}]'.format(modification.id))
+                                'deployment model is most likely in some corrupted'
+                                ' state.[modification_id={0}]'.format(modification.id))
             raise
 
 

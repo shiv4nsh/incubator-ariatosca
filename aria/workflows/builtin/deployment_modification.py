@@ -86,8 +86,7 @@ def modify_deployment(context, modified_nodes, modification_context=None):
             new_relationship_groups = {
                 target_name: list(group)
                 for target_name, group in itertools.groupby(
-                node_instance.relationship_instances,
-                key=lambda r: r.target_name)
+                    node_instance.relationship_instances, key=lambda r: r.target_name)
                 }
             new_relationships = []
             for target_name in target_names:

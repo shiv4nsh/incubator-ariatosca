@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+A set of builtin workflows
+"""
+
 from .install import install
 from .uninstall import uninstall
 from .execute_operation import execute_operation
@@ -23,10 +27,10 @@ from .update import update
 
 __all__ = [
     'install',
-    'uninstall'
+    'uninstall',
     'execute_operation',
     'heal',
-    'scale'
+    'scale',
     'scale_entity',
     'update'
 ]
