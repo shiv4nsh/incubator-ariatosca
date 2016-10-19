@@ -79,10 +79,10 @@ class BaseCommand(LoggerMixin):
                 input_string = input_string.strip()
                 try:
                     parsed_dict.update(json.loads(input_string))
-                except:
+                except BaseException:
                     parsed_dict.update((input.split('=')
-                                       for input in input_string.split(';')
-                                       if input))
+                                        for input in input_string.split(';')
+                                        if input))
             except Exception as exc:
                 raise AriaCliFormatInputsError(str(exc), inputs=input_string)
 
@@ -133,7 +133,7 @@ class InitCommand(BaseCommand):
         self.logger.info('Initiated {0}'.format(args_namespace.blueprint_path))
         self.logger.info(
             'If you make changes to the blueprint, '
-            'run `aria local init` command again to apply them'.format(
+            'run `aria local init -p {0}` command again to apply them'.format(
                 args_namespace.blueprint_path))
 
     def workspace_setup(self):
@@ -159,8 +159,8 @@ class InitCommand(BaseCommand):
         deployment_plan = prepare_deployment_plan(plan=plan.copy(), inputs=inputs)
         return plan, deployment_plan
 
+    @staticmethod
     def create_storage(
-            self,
             blueprint_path,
             blueprint_plan,
             deployment_plan,
@@ -210,7 +210,7 @@ class ExecuteCommand(BaseCommand):
                     args_namespace.workflow_id,
                     deployment.workflows.keys()))
 
-        workflow_parameters = self._merge_and_validate_execution_parameters(
+        workflow_parameters = self._merge_and_validate_parameters(
             workflow,
             args_namespace.workflow_id,
             parameters
@@ -232,8 +232,8 @@ class ExecuteCommand(BaseCommand):
         workflow_engine.execute()
         executor.close()
 
-    def _merge_and_validate_execution_parameters(
-            self,
+    @staticmethod
+    def _merge_and_validate_parameters(
             workflow,
             workflow_name,
             execution_parameters):
@@ -269,7 +269,8 @@ class ExecuteCommand(BaseCommand):
 
         return merged_parameters
 
-    def _load_workflow_handler(self, handler_path):
+    @staticmethod
+    def _load_workflow_handler(handler_path):
         module_name, spec_handler_name = handler_path.rsplit('.', 1)
         try:
             module = import_module(module_name)

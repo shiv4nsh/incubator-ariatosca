@@ -14,10 +14,11 @@
 # limitations under the License.
 
 import os
+import logging
 from getpass import getuser
 from tempfile import gettempdir
+
 from yaml import safe_load
-import logging
 
 from .storage import config_file_path
 
