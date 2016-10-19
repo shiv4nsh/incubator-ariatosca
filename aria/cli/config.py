@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+CLI configuration
+"""
+
 import os
 import logging
 from getpass import getuser
@@ -33,6 +37,11 @@ import_resolver = None
 
 
 def load_configurations():
+    """
+    Dynamically load attributes into the config module from the ``config.yaml`` defined in the user
+    configuration directory
+    :return:
+    """
     config_path = config_file_path()
     with open(config_path) as config_file:
         globals().update(safe_load(config_file) or {})

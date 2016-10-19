@@ -13,6 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+CLI various commands implementation
+"""
+
 import json
 import os
 import sys
@@ -51,6 +55,10 @@ from dsl_parser.tasks import prepare_deployment_plan
 
 
 class BaseCommand(LoggerMixin):
+    """
+    Base class for CLI commands
+    """
+
     def __repr__(self):
         return 'AriaCli({cls.__name__})'.format(cls=self.__class__)
 
@@ -73,7 +81,7 @@ class BaseCommand(LoggerMixin):
 
         parsed_dict = {}
 
-        def format_to_dict(input_string):
+        def _format_to_dict(input_string):
             self.logger.info('Processing inputs source: {0}'.format(input_string))
             try:
                 input_string = input_string.strip()
@@ -86,7 +94,7 @@ class BaseCommand(LoggerMixin):
             except Exception as exc:
                 raise AriaCliFormatInputsError(str(exc), inputs=input_string)
 
-        def handle_inputs_source(input_path):
+        def _handle_inputs_source(input_path):
             self.logger.info('Processing inputs source: {0}'.format(input_path))
             try:
                 with open(input_path) as input_file:
@@ -104,26 +112,30 @@ class BaseCommand(LoggerMixin):
         for input_string in inputs if isinstance(inputs, list) else [inputs]:
             if os.path.isdir(input_string):
                 for input_file in os.listdir(input_string):
-                    handle_inputs_source(os.path.join(input_string, input_file))
+                    _handle_inputs_source(os.path.join(input_string, input_file))
                 continue
             input_files = glob(input_string)
             if input_files:
                 for input_file in input_files:
-                    handle_inputs_source(input_file)
+                    _handle_inputs_source(input_file)
                 continue
-            format_to_dict(input_string)
+            _format_to_dict(input_string)
         return parsed_dict
 
 
 class InitCommand(BaseCommand):
+    """
+    ``init`` command implementation
+    """
+
     _IN_VIRTUAL_ENV = hasattr(sys, 'real_prefix')
 
     def __call__(self, args_namespace):
         super(InitCommand, self).__call__(args_namespace)
-        self.workspace_setup()
+        self._workspace_setup()
         inputs = self.parse_inputs(args_namespace.input) if args_namespace.input else None
-        plan, deployment_plan = self.parse_blueprint(args_namespace.blueprint_path, inputs)
-        self.create_storage(
+        plan, deployment_plan = self._parse_blueprint(args_namespace.blueprint_path, inputs)
+        self._create_storage(
             blueprint_plan=plan,
             blueprint_path=args_namespace.blueprint_path,
             deployment_plan=deployment_plan,
@@ -136,7 +148,7 @@ class InitCommand(BaseCommand):
             'run `aria local init -p {0}` command again to apply them'.format(
                 args_namespace.blueprint_path))
 
-    def workspace_setup(self):
+    def _workspace_setup(self):
         try:
             create_user_space()
             self.logger.debug(
@@ -153,14 +165,14 @@ class InitCommand(BaseCommand):
                 'local storage path already exist - {0}'.format(local_storage()))
         return local_storage()
 
-    def parse_blueprint(self, blueprint_path, inputs=None):
+    def _parse_blueprint(self, blueprint_path, inputs=None):
         plan = parse_from_path(blueprint_path)
         self.logger.info('blueprint parsed successfully')
         deployment_plan = prepare_deployment_plan(plan=plan.copy(), inputs=inputs)
         return plan, deployment_plan
 
     @staticmethod
-    def create_storage(
+    def _create_storage(
             blueprint_path,
             blueprint_plan,
             deployment_plan,
@@ -192,6 +204,10 @@ class InitCommand(BaseCommand):
 
 
 class ExecuteCommand(BaseCommand):
+    """
+    ``execute`` command implementation
+    """
+
     def __call__(self, args_namespace):
         super(ExecuteCommand, self).__call__(args_namespace)
         parameters = (self.parse_inputs(args_namespace.parameters)
